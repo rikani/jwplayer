@@ -17,11 +17,10 @@ const Captions = function(_model) {
         _tracksById = {};
         _unknownCount = 0;
 
-        // Update model without dispatching events _updateMenu()
-        const captionsMenu = _captionsMenu();
+        // Update model without dispatching events
         const attributes = model.attributes;
         attributes.captionsIndex = 0;
-        attributes.captionsList = captionsMenu;
+        attributes.captionsList = _captionsMenu();
         model.set('captionsTrack', null);
     }, this);
 
@@ -48,9 +47,7 @@ const Captions = function(_model) {
                 }
             }
         }
-        const captionsMenu = _captionsMenu();
-        _selectDefaultIndex();
-        _setCaptionsList(captionsMenu);
+        _updateCaptionsList();
     }, this);
 
     // Listen for captions menu index changes from the view
@@ -74,9 +71,7 @@ const Captions = function(_model) {
         // To avoid duplicate tracks in the menu when we reuse an _id, regenerate the tracks array
         _tracks = Object.keys(_tracksById).map(id => _tracksById[id]);
 
-        const captionsMenu = _captionsMenu();
-        _selectDefaultIndex();
-        _setCaptionsList(captionsMenu);
+        _updateCaptionsList();
     }
 
     function _kindSupported(kind) {
@@ -151,8 +146,12 @@ const Captions = function(_model) {
         }
     }
 
-    function _setCaptionsList (captionsMenu) {
-        _model.set('captionsList', captionsMenu);
+    function _updateCaptionsList() {
+        _selectDefaultIndex();
+        const captionsList = _captionsMenu();
+        if (JSON.stringify(captionsList) !== JSON.stringify(_model.get('captionsList'))) {
+            _model.set('captionsList', captionsList);
+        }
     }
 
     this.setSubtitlesTracks = _setSubtitlesTracks;
